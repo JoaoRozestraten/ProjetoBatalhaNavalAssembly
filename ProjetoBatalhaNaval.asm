@@ -17,7 +17,7 @@ endm
  ma db 'Voce acertou!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'
  me db 'Voce errou!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'
  mj db 'Ja disparou nesse local!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'
- minicial db 10,'Digite qualquer tecla para continuar$'
+ minicial db 10,'Seja bem vindo, digite qualquer tecla para continuar$'
  mossT db ' 0 1 2 3 4 5 6 7 8 910111213141516171819  '
  mossL db 'abcdefghijklmnopqrst'
  menleicord db 10,'Digite a cordenada do disparo',10,'$'
@@ -32,6 +32,7 @@ endm
  totaldenau db '/6$'
  stringquantnau db 'Quantidade de embarcacoes que naufragaram:$'
  compar db 'a'
+ obrigado db 10,'Obrigado por jogar',10,'Encerrando...$'
  extra_s dw 0
  controleEncerrar db 0
  quantidadenaufragios db 6
@@ -49,15 +50,6 @@ endm
     xor bx,bx
     xor si,si
     sortear4; devolve 0,1,2 ou 3 em dl
-
-    add dl, 30h
-    mov ah,2
-    int 21h
-    mov dh, dl
-    mov dl, 10
-    int 21h
-    mov dl,dh
-    sub dl, 30h
 
     cmp dl,3
     je config3
@@ -91,6 +83,7 @@ endm
     int 21h 
     mov ah,1
     int 21h
+    call lim_km_prinn
     call in_game
 
 
@@ -655,6 +648,9 @@ endp
     cmp quantacertosTotal, al
     jne jogo
     enddd:
+    mov ah,9
+    mov dx, offset obrigado
+    int 21h
     ret
  in_game endp
 
@@ -686,10 +682,21 @@ endp
     mov ah, 9
     mov dx, offset quantungacertungprintungs
     int 21h
+
+
     mov ah,2
     mov dl, quantacertosTotal; Printar a quantidade de acertos
     or dl, 30h
+    cmp dl, 39h
+    jb naosubitrair
+    push dx
+    mov dl, 31h
     int 21h
+    pop dx
+    sub dl, 10h
+    naosubitrair:
+    int 21h
+
     mov ah,9
     mov dx, offset totaldeposs
     int 21h
@@ -856,6 +863,8 @@ endp
 
 
  ganhar_jogo proc
+ mov ah, 0
+ mov quantacertosTotal, ah
  xor bx, bx
  mov di, 20
  loopconferirganho:
