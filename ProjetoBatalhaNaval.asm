@@ -1,36 +1,36 @@
 TITLE Projeto
 .model small
 sortear4 macro
-    mov ah,2ch
+    mov ah,2ch                            ;pega a hora do computador, coloca os segundos em dx
     int 21h
     shr dx,1
-    and dx, 00000011b
+    and dx, 00000011b                     ;remover numeros irrelevantes
     ;quatro matrizes inicias possíveis
 endm
 
-ZerarValor macro
+ZerarValor macro                          ;macro para reseta os índices da matriz
    xor bx,bx
    xor si,si
 endm
 SortearMacro macro
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   call sortear3                           ;sorteia 3 valores (quantidade de casa que o barco pode andar pro lado)
+   add bx, dx                              ;altera a linha
+   call sortear3                           ;sorteia 3 valores (quantidade de casa que o barco pode andar pro lado)
+   add si, dx                              ;altera a coluna
 endm
 PrintaMsg macro Valor
-   mov ah,Valor
+   mov ah,Valor                            ;O número da função é passado para ah e a função é executada
    int 21h
 endm
 PopVMatriz macro
-   pop si
+   pop si                                  ;macro para retornar valores dos índices, é usado nos modelos, para inserir os hidroaviões na matriz
    pop bx
 endm
-PushVMatriz macro
+PushVMatriz macro                          ;macro para retornar valores dos índices, é usado nos modelos, para inserir os hidroaviões na matriz
    push bx
    push si
 endm
-PulaLinha macro
+PulaLinha macro                           ;macro LF (pula uma linha imprimindo o enter na tela)
    mov ah,2
    mov dl,10
    int 21h
@@ -39,57 +39,78 @@ endm
 
 .stack 200h
 .data ;Matriz 20x20 --> 400 de área 
+
  matriz db 20 dup(20 dup(0h))
- matrizshow db 20 dup(20 dup(30h));mostrar onde os disparos foram
- ma db 'Voce acertou!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'
- me db 'Voce errou!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'
- mj db 'Ja disparou nesse local!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'
- minicial db 10,'Seja bem vindo, digite qualquer tecla para continuar$'
- mossT db ' 0 1 2 3 4 5 6 7 8 910111213141516171819  '
- mossL db 'abcdefghijklmnopqrst'
- menleicord db 10,'Digite a cordenada do disparo',10,'$'
- menleiletra db 'Entre com a letra(somente de A ate T):$'
+
+ matrizshow db 20 dup(20 dup(30h))                                                                                   ;matriz onde os barcos são alocados
+
+ ma db 'Voce acertou!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'                 ;ma= mensagem de acerto
+
+ me db 'Voce errou!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'                   ;me= mensagem de erro
+
+ mj db 'Ja disparou nesse local!',10,' Digite D para desistir ou qualquer outra tecla para disparar novamente$'      ;mj= mensagem já disparou nesse local
+
+ minicial db 10,'Seja bem vindo, digite qualquer tecla para continuar$'                                              ;mensagem inicial
+
+ mossT db ' 0 1 2 3 4 5 6 7 8 910111213141516171819  '                                                               ;numeros para as colunas
+
+ mossL db 'abcdefghijklmnopqrst'                                                                                     ;quando a coordenada for digitada, as letras podem ser maiusculas ou minusculas
+
+ menleicord db 10,'Digite a cordenada do disparo',10,'$'                                                             ;mensagens pedindo as coordenadas   
+
+ menleiletra db 'Entre com a letra(somente de A ate T):$'                                                   
+
  menleinum db 'Entre com o numero (2 digitos, exemplo->01) de 00 ate 19:$'
- optroccord db 'Deseja continuar com a sua cordenada? [','$'
- contoptroccord db ']',10,'Digite 1 para trocar ou qualquer outra tecla para confirmar o disparo:$'
- quantungacertungprintungs db 'Quantidade de acertos total:$'
- totaldeposs db '/19$'
- totaldebar1 db '/1$'
- totaldebar2 db '/2$'
- totaldenau db '/6$'
- stringquantnau db 'Quantidade de embarcacoes que naufragaram:$'
- compar db 'a'
- obrigado db 10,'Obrigado por jogar',10,'Encerrando...$'
- extra_s dw 0
- controleEncerrar db 0
- quantidadenaufragios db 6
- quantacertosTotal db 0 
+
+ optroccord db 'Deseja continuar com a sua cordenada? [','$'                                                         ;pergunta se quer continuar com a mesma coordenada   
+
+ contoptroccord db ']',10,'Digite 1 para trocar ou qualquer outra tecla para confirmar o disparo:$'                  ;continuação do optrocccord
+
+ quantungacertungprintungs db 'Quantidade de acertos total:$'                                                        ;mensagem para mostrar a quantidade de acertos total
+
+ totaldeposs db '/19$'                                                                                               ;total de acertos possíveis, baseado na quantidade de posições das embarcações
+
+ totaldenau db '/6$'                                                                                                 ;quantidade de naufrágios   
+
+ stringquantnau db 'Quantidade de embarcacoes que naufragaram:$'       
+
+ compar db 'a'                                                                                                       ;não ressortear números iguais
+
+ obrigado db 10,'Obrigado por jogar',10,'Encerrando...$'                                                             ;fim de jogo
+
+ extra_s dw 0                                                                                                        ;guarda a posição para printar a próxima matriz
+
+ controleEncerrar db 0                                                                                               ;usada para parar o jogo
+
+ quantidadenaufragios db 6                                                                                           ;controla a quantidade de náufragios
+
+ quantacertosTotal db 0                                                                                              ;quantidade de acertos até o momento
  .code
  ;num 1 -> restricao
  ;1 encouracado -> 4 (tamanho) -> num 2
  ;1 fragata -> 3 -> num 3
  ;2 submarinos -> 2 -> num 4 e 5
- ;2 Hidroavião -> 3 e 1 -> num 5 e 6
+ ;2 hidroavião -> 3 e 1 -> num 5 e 6
  main PROC
-    mov ax, @data  ; Configura o segmento de dados ->DS
+    mov ax, @data                                             ; Configura o segmento de dados -> DS
     mov ds, ax
     
-    ZerarValor
-    sortear4; devolve 0,1,2 ou 3 em dl
+    ZerarValor                                                ;zera indices
+    sortear4                                                  ;devolve 0,1,2 ou 3 em dl
 
-    cmp dl,3
+    cmp dl,3                                                  ;se o sorteado for 3, pula para config3      
     je config3
     
-    cmp dl, 2
+    cmp dl, 2                                                 ;se o sorteado for 2, pula para config2  
     je config2
 
-    cmp dl, 1
+    cmp dl, 1                                                 ;se o sorteado for 1, pula para config1    
     je config1
     
-    call mod0
-    jmp final_da_definicao
+    call mod0                                                 ;se o sorteado for 0, pula para o procedimento mod0 (modelo 0)
+    jmp final_da_definicao                                    ;pula para final da definição após sair do procedimento
 
-    config3:
+    config3:                                                  ;a depender de cada config sorteada, entra em seu respectivo procedimento
     call mod3
     jmp final_da_definicao
 
@@ -100,10 +121,10 @@ endm
     config1:
     call mod1
 
-    final_da_definicao:
+    final_da_definicao:                                                                                               
 
-    call lim_km_prinn
-   
+    call lim_km_prinn                                         ;chama o procedimento lim_km_prinn
+
     lea dx, minicial
     PrintaMsg 9
     PrintaMsg 1
@@ -111,90 +132,98 @@ endm
     call in_game
 
 
-    mov ah,4ch ;encerrando
+    mov ah,4ch                                                 ;encerrando
     int 21h
  main ENDP
  
- ;MOD3
+ 
+
+;                       *********TODOS OS MODELOS SEGUEM O MESMO PRINCÍPIO************
+
+
+
+;                                   MODELO1
+
+
  mod3 PROC
-   ZerarValor 
-   SortearMacro
+   ZerarValor                                                  ;zera índices SI e DI
+   SortearMacro                                                ;sorteia valor
    mov cx,4
    mov al, 20
-   mul bl
+   mul bl                                                                        
    xchg bx, ax
-   encouracado1:
+   encouracado1:                                               ;dispõe o encouraçado na posição sorteada
    mov matriz [bx][si], 1
    inc si
    loop encouracado1
 
-   mov bx, 14
-   mov si, 17
-   SortearMacro
+   mov bx, 14                                                  ;muda a posição dos índices
+   mov si, 17  
+   SortearMacro                                                ;sorteia valor
    mov cx, 3
-   mov al,20
+   mov al,20                                                   ;a depender do valor sorteado, irá para uma posição aleatória da matriz
    mul bl
    xchg bx, ax
    fragata1:
-   mov matriz [bx][si], 2
-   add bx, 20
+   mov matriz [bx][si], 2                                      ;dispõe a fragata (3 posições -> cx = 3) na posição sorteada
+   add bx, 20                                                  ;vai para próxima linha (continuação da disposição da fragata na matriz)
    loop fragata1 
 
-   mov bx, 10
+   mov bx, 10                                                  ;muda a posição dos índices                                                                                     
    mov si, 5
-   SortearMacro
-   mov cx,2
+   SortearMacro                                                ;sorteia valor      
+   mov cx,2                                                    ;a depender do valor sorteado, irá para uma posição aleatória da matriz
    mov al, 20
    mul bl
    xchg bx, ax
    submarino1:
-   mov matriz [bx][si], 3
+   mov matriz [bx][si], 3                                      ;dispõe o submarino1 (2 posições -> cx = 2) na posição sorteada
    inc si
    loop submarino1
 
-   xor bx,bx
+   xor bx,bx                                                   ;muda a posição dos índices
    mov si, 17
-   SortearMacro
-   mov cx, 2
-   mov al,20
-   mul bl
+   SortearMacro                                                ;sorteia valor
+   mov cx, 2                                                                                                                        
+   mov al,20                                                   ;a depender do valor sorteado, irá para uma posição aleatória da matriz
+   mul bl                                                                                                                  
    xchg bx, ax
-   submarino2:
-   mov matriz [bx][si], 4
+   submarino2:                                                 ;dispõe o submarino2 (2 posições -> cx = 2) na posição sorteada   
+   mov matriz [bx][si], 4                                                                                                  
    add bx, 20
    loop submarino2
   
-   mov bx, 3
-   mov si, 7
-   SortearMacro
-   mov cx, 3
-   mov al,20
+   mov bx, 3                                                    ;muda a posição dos índices
+   mov si, 7               
+   SortearMacro                                                 ;sorteia valor  
+   mov cx, 3                                                                                                             
+   mov al,20                                                    ;a depender do valor sorteado, vai para uma posição aleatória da matriz
    mul bl
    xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   add si, 1
-   mov matriz [bx][si],5
-   PopVMatriz
+   PushVMatriz                                                  ;pilha -> si|bx                                                                                           
+   add bx, 20                                                   ;bx na próxima linha
+   add si, 1                                                    ;si na próxima coluna
+   mov matriz [bx][si],5                                        ;insere a "cabeça" do hidroavião
+   PopVMatriz                                                   ;retorna valor dos registradores
    hidro_aviao1:
-   mov matriz [bx][si],5
+   mov matriz [bx][si],5                                        ;insere o resto do corpo do hidroavião
    add bx, 20
    loop hidro_aviao1
 
-   mov bx, 15
+   mov bx, 15                                                   ;muda a posição dos índices
    xor si,si
-   SortearMacro
-   mov cx, 3
+   SortearMacro                                                 ;sorteia valor 
+   mov cx, 3                                                    ;a depender do valor sorteado, vai para uma posição aleatória da matriz                                      
    mov al,20
    mul bl
    xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   add si, 1
-   mov matriz [bx][si],6
-   PopVMatriz
+   PushVMatriz                                                  ;pilha -> si|bx   
+   add bx, 20                                                   ;bx na próxima linha  
+   add si, 1                                                    ;si na próxima coluna
+   mov matriz [bx][si],6                                        ;insere a "cabeça" do hidroavião     
+   PopVMatriz                                                   ;retorna valor dos registradores  
    hidro_aviao2:
-   mov matriz [bx][si],6
+   mov matriz [bx][si],6                                        ;insere o resto do corpo do hidroavião
    add bx, 20
    loop hidro_aviao2
    
@@ -204,12 +233,7 @@ endm
  mod3 ENDP
 
 
-
-
-
-
-
- ;MOD2
+;                                          MODELO 2
  mod2 PROC
    xor bx,bx
    mov si, 13
@@ -283,7 +307,7 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   PushVMatriz; pilha -> si|bx
+   PushVMatriz                                    
    add bx, 20
    add si, 1
    mov matriz [bx][si],6
@@ -300,10 +324,7 @@ endm
 
 
 
-
-
-
- ;MOD1
+;                                                  MODELO 1
  mod1 PROC
    mov bx, 13
    xor si,si
@@ -397,10 +418,10 @@ endm
 
 
 
- ;MOD0
+ ;                                            MODELO 0
  mod0 PROC
    
-  mov bx, 13
+   mov bx, 13
    mov si, 1
    SortearMacro
    mov cx, 4
@@ -486,14 +507,15 @@ endm
  mod0 ENDP
 
  ;Sortear3
+
  sortear3 proc
-    mov ah,2ch
+    mov ah,2ch                                         ;pega os segundos da hora do computador
     ResortearMaior3:
     int 21h
-    and dx, 00000011b
+    and dx, 00000011b                                  ;remove números irrelevantes
     cmp dx, 3
-    jae ResortearMaior3
-    cmp dl,compar[0]
+    jae ResortearMaior3                                ;ressortear caso for 3 ou maior          
+    cmp dl,compar[0]                                   ;evitar que ele pegue a mesma hora
     je ResortearMaior3
     mov compar[0], dl
     ret
@@ -503,69 +525,71 @@ endp
 
 
  addaprinta proc
-  mov bx, extra_s
-  mov dl, mossT[bx]
+                                                        ;na primeira vez:
+  mov bx, extra_s                                       ;bx <-0                               
+  mov dl, mossT[bx]                                     ;move primeiro espaço para DL e imprime
   int 21h
   add extra_s, 1
 
-  mov bx, extra_s
-  mov dl, mossT[bx]
+  mov bx, extra_s                                       ;bx <-1
+  mov dl, mossT[bx]                                     ;move numero para DL e imprime
   int 21h
-  add extra_s, 1
+  add extra_s, 1                                        ;extra_s <- 2
 
   ret
  addaprinta endp
 
- lim_km_prinn proc
-    mov cx, 20
-    mov dl, ' '
+ lim_km_prinn proc                                     
+    mov cx, 20                                         ;procedimento que imprime as letras de cima do tabuleiro do jogo
+    mov dl, ' '                                       
     PrintaMsg 2
+    int 21h                                            ;printa espaços
     int 21h
-    int 21h
-    mov dx, 'A'
+    mov dx, 'A'                                       
     print_letras_tabela:
-    int 21h
-    push dx
-    mov dx, ''
-    int 21h
-    pop dx
+    int 21h                                            ;printa primeira letra   
+    push dx                                            ;salva na pilha
+    mov dx, ''                                         ;printa espaço
+    int 21h 
+    pop dx                                             ;retorna a letra e vai para a próxima          
     inc dl
-    loop print_letras_tabela
-    mov dl, 10
+    loop print_letras_tabela                           ;até imprimir 20 letras
+    mov dl, 10                                         ;ENTER
     int 21h
 
     call addaprinta
-    mov dl, ' '
+    mov dl, ' '                                        ;após printar o primeiro número, dá um espaço 
     int 21h
 
+   ;imprimindo a matrizshow, que é a matriz definida para a impressão
 
-    xor bx,bx
-    mov di, 20
+    xor bx,bx                                         ;zera índice das linhas
+    mov di, 20                                        ;di é o contador das linhas
     test_print:
-    mov cx, 20
-    xor si,si
+    mov cx, 20                                        ;cx é o contador das colunas
+    xor si,si                                         ;zera índice das colunas
     test_print1:
-    mov dl, matrizshow[bx][si]
-    add dl, 30h
+    mov dl, matrizshow[bx][si]                        ;primeiro elemento em dl
+    add dl, 30h                                       ;transforma em caractere
+    int 21h                                           ;imprime
+    inc si                                            ;próxima coluna
+    mov dl, ' '                                       ;espaço entre colunas
     int 21h
-    inc si
-    mov dl, ' '
-    int 21h
-    loop test_print1
-    mov dl, 10
+    loop test_print1                                  ;enquanto as colunas não forem totalmente impressas, pula para test_print1
+    mov dl, 10                                        ;imprime o enter para espaçar as linhas      
     int 21h
 
-    push bx
-    call addaprinta
-    mov dl, ' '
+    push bx                                           ;salva bx na pilha (índice das linhas)
+    call addaprinta                                   ;insere o próximo número antes de printar as linhas da matriz, (refaz o processo com o extra_s em 2)
+    mov dl, ' '                                       ;espaço
     int 21h
-    pop bx
+    pop bx                                            ;índice das linhas novamente em bx
 
 
-    add bx, 20
-    dec di
+    add bx, 20                                        ;próxima linha
+    dec di                                            ;faz isso 20 vezes
     jnz test_print
-    mov extra_s, 0
+    mov extra_s, 0                                    ;reseta a variável extra_s
     ret
  lim_km_prinn endp
 
@@ -697,7 +721,7 @@ endp
 
 
  limpar_tela proc
- mov dl, 10
+ mov dl, 10                                                                ;limpa a tela com espaços sucessivos
  mov cx, 30
  mov ah, 2
  loopdelimpartela:
@@ -799,7 +823,7 @@ endp
 
 
  naufragios proc
- ;Recebe a info de qual é o numero da embaração com Al antes do call
+                                                                                       ;Recebe a info de qual é o numero da embarcação com Al antes do call
  mov ah, 6
  mov quantidadenaufragios, ah
 
@@ -833,7 +857,7 @@ endp
  laco2:
  cmp matriz[bx][si], ah
  jne negativo
- mov al, 1
+ mov al, 1                                                  ;se for 
  sub quantidadenaufragios, al
  jmp finalneg
  negativo:
