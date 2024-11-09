@@ -22,6 +22,19 @@ PrintaMsg macro Valor
    mov ah,Valor
    int 21h
 endm
+PopVMatriz macro
+   pop si
+   pop bx
+endm
+PushVMatriz macro
+   push bx
+   push si
+endm
+PulaLinha macro
+   mov ah,2
+   mov dl,10
+   int 21h
+endm
 
 
 .stack 200h
@@ -64,9 +77,6 @@ endm
     ZerarValor
     sortear4; devolve 0,1,2 ou 3 em dl
 
-    add dl,30h
-    mov ah,2
-    int 21h
     cmp dl,3
     je config3
     
@@ -161,13 +171,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1:
    mov matriz [bx][si],5
    add bx, 20
@@ -180,13 +188,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2:
    mov matriz [bx][si],6
    add bx, 20
@@ -260,13 +266,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1_2:
    mov matriz [bx][si],5
    add bx, 20
@@ -279,13 +283,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2_2:
    mov matriz [bx][si],6
    add bx, 20
@@ -358,13 +360,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    dec si
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1_1:
    mov matriz [bx][si],5
    add bx, 20
@@ -377,13 +377,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    inc si
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2_1:
    mov matriz [bx][si],6
    add bx, 20
@@ -457,13 +455,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    inc si
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1_0:
    mov matriz [bx][si],5
    inc si
@@ -476,13 +472,11 @@ endm
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    inc si
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2_0:
    mov matriz [bx][si],6
    inc si
@@ -611,8 +605,7 @@ endp
     mov dx,offset totaldenau
     PrintaMsg 9
 
-    mov dl,10
-    PrintaMsg 2
+    PulaLinha
 
     mov dx, offset quantungacertungprintungs
     PrintaMsg 9
@@ -634,8 +627,7 @@ endp
     mov dx, offset totaldeposs
     PrintaMsg 9
 
-    mov dl,10
-    PrintaMsg 2
+    PulaLinha
     xor cx,cx
     mov dx, offset menleicord
     PrintaMsg 9
@@ -659,8 +651,7 @@ endp
     and ax, 00ffh
     mov si, ax
 
-    mov dl, 10
-    PrintaMsg 2
+    PulaLinha
 
     mov dx, offset menleinum
     PrintaMsg 9
@@ -679,8 +670,7 @@ endp
     mul bx
     mov bx, ax
 
-    mov dl, 10
-    PrintaMsg 2
+    PulaLinha
 
     lea dx, optroccord
     PrintaMsg 9
@@ -719,8 +709,7 @@ endp
 
  conferir_disparo proc
    
-   mov dl,10
-   PrintaMsg 2
+   PulaLinha
 
    mov dl, 30h
    cmp matrizshow[bx][si], dl 
