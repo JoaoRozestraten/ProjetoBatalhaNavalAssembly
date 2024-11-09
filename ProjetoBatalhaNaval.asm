@@ -8,6 +8,33 @@ sortear4 macro
     ;quatro matrizes inicias possíveis
 endm
 
+ZerarValor macro
+   xor bx,bx
+   xor si,si
+endm
+SortearMacro macro
+   call sortear3
+   add bx, dx
+   call sortear3
+   add si, dx
+endm
+PrintaMsg macro Valor
+   mov ah,Valor
+   int 21h
+endm
+PopVMatriz macro
+   pop si
+   pop bx
+endm
+PushVMatriz macro
+   push bx
+   push si
+endm
+PulaLinha macro
+   mov ah,2
+   mov dl,10
+   int 21h
+endm
 
 
 .stack 200h
@@ -47,8 +74,7 @@ endm
     mov ax, @data  ; Configura o segmento de dados ->DS
     mov ds, ax
     
-    xor bx,bx
-    xor si,si
+    ZerarValor
     sortear4; devolve 0,1,2 ou 3 em dl
 
     cmp dl,3
@@ -79,10 +105,8 @@ endm
     call lim_km_prinn
    
     lea dx, minicial
-    mov ah,9
-    int 21h 
-    mov ah,1
-    int 21h
+    PrintaMsg 9
+    PrintaMsg 1
     call lim_km_prinn
     call in_game
 
@@ -93,12 +117,8 @@ endm
  
  ;MOD3
  mod3 PROC
-   xor bx,bx
-   xor si,si 
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   ZerarValor 
+   SortearMacro
    mov cx,4
    mov al, 20
    mul bl
@@ -110,10 +130,7 @@ endm
 
    mov bx, 14
    mov si, 17
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
@@ -125,10 +142,7 @@ endm
 
    mov bx, 10
    mov si, 5
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,2
    mov al, 20
    mul bl
@@ -138,12 +152,9 @@ endm
    inc si
    loop submarino1
 
-   mov bx, 0
+   xor bx,bx
    mov si, 17
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 2
    mov al,20
    mul bl
@@ -155,43 +166,33 @@ endm
   
    mov bx, 3
    mov si, 7
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1:
    mov matriz [bx][si],5
    add bx, 20
    loop hidro_aviao1
 
    mov bx, 15
-   mov si, 0
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   xor si,si
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2:
    mov matriz [bx][si],6
    add bx, 20
@@ -210,12 +211,9 @@ endm
 
  ;MOD2
  mod2 PROC
-   mov bx, 0
+   xor bx,bx
    mov si, 13
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,4
    mov al, 20
    mul bl
@@ -227,10 +225,7 @@ endm
 
    mov bx, 1
    mov si, 1
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
@@ -242,10 +237,7 @@ endm
 
    mov bx, 5
    mov si, 10
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,2
    mov al, 20
    mul bl
@@ -257,10 +249,7 @@ endm
 
    mov bx, 5
    mov si, 17
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 2
    mov al,20
    mul bl
@@ -272,21 +261,16 @@ endm
   
    mov bx, 10
    mov si, 8
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1_2:
    mov matriz [bx][si],5
    add bx, 20
@@ -294,21 +278,16 @@ endm
 
    mov bx, 15
    mov si, 15
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    add si, 1
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2_2:
    mov matriz [bx][si],6
    add bx, 20
@@ -327,11 +306,8 @@ endm
  ;MOD1
  mod1 PROC
    mov bx, 13
-   mov si, 0
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   xor si,si
+   SortearMacro
    mov cx, 4
    mov al,20
    mul bl
@@ -343,10 +319,7 @@ endm
 
    mov bx, 16
    mov si, 12
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,3
    mov al, 20
    mul bl
@@ -358,10 +331,7 @@ endm
 
    mov bx, 8
    mov si, 10
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,2
    mov al, 20
    mul bl
@@ -373,10 +343,7 @@ endm
 
    mov bx, 11
    mov si, 5
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 2
    mov al,20
    mul bl
@@ -386,45 +353,35 @@ endm
    add bx, 20
    loop submarino2_1
 
-   mov bx, 0
+   xor bx,bx
    mov si, 2
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    dec si
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1_1:
    mov matriz [bx][si],5
    add bx, 20
    loop hidro_aviao1_1
 
-   mov bx, 0
+   xor bx,bx
    mov si, 10
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    inc si
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2_1:
    mov matriz [bx][si],6
    add bx, 20
@@ -445,10 +402,7 @@ endm
    
   mov bx, 13
    mov si, 1
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 4
    mov al,20
    mul bl
@@ -460,10 +414,7 @@ endm
 
    mov bx, 16
    mov si, 12
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,3
    mov al, 20
    mul bl
@@ -475,10 +426,7 @@ endm
 
    mov bx, 8
    mov si, 10
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx,2
    mov al, 20
    mul bl
@@ -490,10 +438,7 @@ endm
 
    mov bx, 11
    mov si, 5
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 2
    mov al,20
    mul bl
@@ -503,45 +448,35 @@ endm
    add bx, 20
    loop submarino2_0
 
-   mov bx, 0
+   xor bx,bx
    mov si, 10
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    inc si
    mov matriz [bx][si],5
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao1_0:
    mov matriz [bx][si],5
    inc si
    loop hidro_aviao1_0
 
-   mov bx, 0
-   mov si, 0
-   call sortear3
-   add bx, dx
-   call sortear3
-   add si, dx
+   xor bx,bx
+   xor si,si
+   SortearMacro
    mov cx, 3
    mov al,20
    mul bl
    xchg bx, ax
-   push bx
-   push si; pilha -> si|bx
+   PushVMatriz; pilha -> si|bx
    add bx, 20
    inc si
    mov matriz [bx][si],6
-   pop si
-   pop bx
+   PopVMatriz
    hidro_aviao2_0:
    mov matriz [bx][si],6
    inc si
@@ -583,9 +518,8 @@ endp
 
  lim_km_prinn proc
     mov cx, 20
-    mov ah,2
     mov dl, ' '
-    int 21h
+    PrintaMsg 2
     int 21h
     int 21h
     mov dx, 'A'
@@ -648,9 +582,8 @@ endp
     cmp quantacertosTotal, al
     jne jogo
     enddd:
-    mov ah,9
     mov dx, offset obrigado
-    int 21h
+    PrintaMsg 9
     ret
  in_game endp
 
@@ -660,28 +593,22 @@ endp
 
     lerdnovo_ampliado:
     call limpar_tela
-    mov ah, 9
     mov dx, offset stringquantnau
-    int 21h
+    PrintaMsg 9
     
     call naufragios
 
-    mov ah,2
     mov dl, quantidadenaufragios
     or dl, 30h
-    int 21h
+    PrintaMsg 2
 
-    mov ah, 9
     mov dx,offset totaldenau
-    int 21h
+    PrintaMsg 9
 
-    mov ah,2
-    mov dl,10
-    int 21h
+    PulaLinha
 
-    mov ah, 9
     mov dx, offset quantungacertungprintungs
-    int 21h
+    PrintaMsg 9
 
 
     mov ah,2
@@ -697,17 +624,13 @@ endp
     naosubitrair:
     int 21h
 
-    mov ah,9
     mov dx, offset totaldeposs
-    int 21h
-    mov ah,2
-    
-    mov dl,10
-    int 21h
-    mov ah,9
+    PrintaMsg 9
+
+    PulaLinha
     xor cx,cx
     mov dx, offset menleicord
-    int 21h
+    PrintaMsg 9
 
     mov dx, offset menleiletra
     int 21h
@@ -717,8 +640,7 @@ endp
     jmp lerdnovo_ampliado
     codigonormal:
 
-    mov ah, 1
-    int 21h
+    PrintaMsg 1
     cmp al, 60h
     jb maius
     sub al, 61h
@@ -729,23 +651,18 @@ endp
     and ax, 00ffh
     mov si, ax
 
-    mov ah,2
-    mov dl, 10
-    int 21h
+    PulaLinha
 
-    mov ah, 9
     mov dx, offset menleinum
-    int 21h
+    PrintaMsg 9
 
-    mov ah, 1
-    int 21h
+    PrintaMsg 1
     xor al, 30h
     mov ch, al
     mov bl, 10
     mul bl
     mov bx, ax
-    mov ah, 1
-    int 21h
+    PrintaMsg 1
     and ax, 000fh
     mov cl, al
     add bx, ax
@@ -753,17 +670,13 @@ endp
     mul bx
     mov bx, ax
 
-    mov ah,2
-    mov dl, 10
-    int 21h
+    PulaLinha
 
-    mov ah,9
     lea dx, optroccord
-    int 21h
+    PrintaMsg 9
 
-    mov ah,2
     mov dl,mossL[si]
-    int 21h
+    PrintaMsg 2
 
     mov dl, ch
     add dl, 30h
@@ -772,12 +685,10 @@ endp
     add dl,30h
     int 21h
     
-    mov ah, 9
     lea dx, contoptroccord
-    int 21h
+    PrintaMsg 9
     
-    mov ah,1
-    int 21h
+    PrintaMsg 1
     cmp al, 31h
     je lerdnovo
     
@@ -798,9 +709,7 @@ endp
 
  conferir_disparo proc
    
-   mov ah, 2
-   mov dl,10
-   int 21h
+   PulaLinha
 
    mov dl, 30h
    cmp matrizshow[bx][si], dl 
@@ -813,31 +722,27 @@ endp
    mov matriz[bx][si], 0
    mov matrizshow[bx][si],0Fah
    call lim_km_prinn
-   mov ah, 9
    lea dx, ma
-   int 21h
+   PrintaMsg 9
    
    jmp acertou
    errou:
    mov matrizshow[bx][si],1fh
    call lim_km_prinn
-   mov ah, 9
    lea dx, me
-   int 21h
+   PrintaMsg 9
    acertou:
 
    jmp nao_dsp_ja
 
    ja_disparou:
    call lim_km_prinn
-   mov ah,9
    lea dx, mj
-   int 21h
+   PrintaMsg 9
    
    nao_dsp_ja:
 
-   mov ah, 1
-   int 21h
+   PrintaMsg 1
 
    cmp al, 100
    jne naosub
