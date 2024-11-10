@@ -571,7 +571,7 @@ endp
     xor si,si                                         ;zera índice das colunas
     test_print1:
     mov dl, matrizshow[bx][si]                        ;primeiro elemento em dl
-    add dl, 30h                                       ;transforma em caractere
+    add dl, 30h                                       ;transforma em aspas
     int 21h                                           ;imprime
     inc si                                            ;próxima coluna
     mov dl, ' '                                       ;espaço entre colunas
@@ -597,17 +597,17 @@ endp
 
  in_game proc
     jogo:
-    mov al, 1
-    cmp controleEncerrar, al
-    je enddd
-    call perguntar_cord
+    mov al, 1                                         ;o encerrento do programa acontece quando a variável controle_encerrar é igual a 1.
+    cmp controleEncerrar, al                          ;se a quantidade de acertos for igual a 19, ele acertou todos os barcos, e o controle_encerrar é igual a 1.               
+    je enddd                                          ;se for 1, pula para o final
+    call perguntar_cord                               ;usuário não acertou tudo ainda, chama procedimento para perguntar coordenada
     call conferir_disparo
     call ganhar_jogo
     mov al, 19; Quantidade total de slots de barco
     cmp quantacertosTotal, al
     jne jogo
     enddd:
-    mov dx, offset obrigado
+    mov dx, offset obrigado                            ;fim de jogo
     PrintaMsg 9
     ret
  in_game endp
@@ -617,47 +617,47 @@ endp
     
 
     lerdnovo_ampliado:
-    call limpar_tela
-    mov dx, offset stringquantnau
+    call limpar_tela                                  ;limpa a tela
+    mov dx, offset stringquantnau                     ;mostra a quantidade de naufrágios
     PrintaMsg 9
     
-    call naufragios
+    call naufragios                                   ;chama o procedimento para verificar a quantidade de naufrágios 
 
-    mov dl, quantidadenaufragios
+    mov dl, quantidadenaufragios                      ;imprime a quantidade de embarcações que o usuário naufragou
     or dl, 30h
     PrintaMsg 2
 
-    mov dx,offset totaldenau
+    mov dx,offset totaldenau                          ;mostra o /6 para indicar quantos naufrágios restam para ganhar o jogo
     PrintaMsg 9
 
-    PulaLinha
+    PulaLinha                                            
 
-    mov dx, offset quantungacertungprintungs
+    mov dx, offset quantungacertungprintungs          ;mostra string antes de mostrar a quantidade de posições das embarcações que o usuário acertou (total=19)
     PrintaMsg 9
 
 
     mov ah,2
-    mov dl, quantacertosTotal; Printar a quantidade de acertos
+    mov dl, quantacertosTotal                         ;imprime a quantidade de acertos até agora
     or dl, 30h
-    cmp dl, 39h
+    cmp dl, 39h                                       ;verifica se o número é maior que 9
     jb naosubitrair
-    push dx
-    mov dl, 31h
+    push dx                                           ;guarda o número na pilha
+    mov dl, 31h                                       ;imprime o 1 na frente
     int 21h
-    pop dx
-    sub dl, 10h
-    naosubitrair:
+    pop dx                                            ;volta o número em dx
+    sub dl, 10h                                       ;remove a dezena
+    naosubitrair:                                     ;não é maior, imprime normalmente
     int 21h
 
-    mov dx, offset totaldeposs
+    mov dx, offset totaldeposs                        ;mostra o /19 para indicar quantos acertod restam
     PrintaMsg 9
 
     PulaLinha
     xor cx,cx
-    mov dx, offset menleicord
+    mov dx, offset menleicord                         ;imprime mensagem para o usuário digitar a coordenadas
     PrintaMsg 9
 
-    mov dx, offset menleiletra
+    mov dx, offset menleiletra                        ;imprime mensagem para o usuário digitar a coordenada das colunas (letras)  
     int 21h
 
     jmp codigonormal
@@ -665,65 +665,65 @@ endp
     jmp lerdnovo_ampliado
     codigonormal:
 
-    PrintaMsg 1
-    cmp al, 60h
+    PrintaMsg 1                                       ;lê um caractere
+    cmp al, 60h                                       ;verifica se é menor que 60h, se for, é uma letra maiúscula
     jb maius
     sub al, 61h
     jmp minusc
     maius:
-    sub al, 41h
+    sub al, 41h                                       ;se for maiuscula, subtrai 41 para as letras ficarem "numeradas" coretamente, A=1, B=2, C=3...               
     minusc:
-    and ax, 00ffh
-    mov si, ax
+    and ax, 00ffh                                     ;se for minúscula transforma em numero direto
+    mov si, ax                                        ;passa valor numérico para o índice das colunas
 
     PulaLinha
 
-    mov dx, offset menleinum
+    mov dx, offset menleinum                          ;pede que o usuário digite a coordenada das linhas (números)
     PrintaMsg 9
 
-    PrintaMsg 1
-    xor al, 30h
-    mov ch, al
-    mov bl, 10
+    PrintaMsg 1                                       ;lê um caractere
+    xor al, 30h                                       ;transforma em número
+    mov ch, al                                        ;move para ch
+    mov bl, 10                                        ;multiplica o número digitado por 10, para entrada de números superiores a 9
     mul bl
-    mov bx, ax
-    PrintaMsg 1
-    and ax, 000fh
-    mov cl, al
-    add bx, ax
-    mov al, 20
-    mul bx
-    mov bx, ax
+    mov bx, ax                                        ;resultado da multiplicação vai para bx (linhas)
+    PrintaMsg 1                                       ;lê segundo dígito            
+    and ax, 000fh                                     ;limpa ah            
+    mov cl, al                                        ;move número para cl
+    add bx, ax                                        ;soma com o bx que foi multiplicado por 10
+    mov al, 20                                        ;multiplica por 20 para ir para a linha digitada                      
+    mul bx                                            
+    mov bx, ax                                        ;move para indice das linhas 
 
     PulaLinha
 
-    lea dx, optroccord
+    lea dx, optroccord                                ;pergunta se o usuário quer trocar de coordenada   
     PrintaMsg 9
 
-    mov dl,mossL[si]
+    mov dl,mossL[si]                                  ;mostra as coordenadas atuais
     PrintaMsg 2
 
-    mov dl, ch
-    add dl, 30h
+    mov dl, ch                                        ;o que está no ch é o primeiro número da coordenada
+    add dl, 30h                                       ;transforma em caractere
     int 21h
-    mov dl, cl
-    add dl,30h
+    mov dl, cl                                        ;o que está no cl é o segundo número da coordenada    
+    add dl,30h                                        ;transforma em caractere   
     int 21h
     
-    lea dx, contoptroccord
+    lea dx, contoptroccord                            ;continuação da string
     PrintaMsg 9
     
-    PrintaMsg 1
-    cmp al, 31h
+    PrintaMsg 1                                       ;lê caractere para verificar se o usuário irá trocar
+    cmp al, 31h                                       ;se for 1, ele refaz o processo de leitura de coordenada
     je lerdnovo
-    
+                                                      ;se não, volta para o procedimento que chamou
     ret
  perguntar_cord endp
 
 
  limpar_tela proc
- mov dl, 10                                                                ;limpa a tela com espaços sucessivos
- mov cx, 30
+ mov dl, 10                                           ;procedimento para limpar a tela com LF sucessivos
+ mov cx, 30                                           ;imprime o enter 30 vezes
  mov ah, 2
  loopdelimpartela:
  int 21h
@@ -736,51 +736,51 @@ endp
    
    PulaLinha
 
-   mov dl, 30h
-   cmp matrizshow[bx][si], dl 
-   jne ja_disparou
+   mov dl, 30h                                         ;move '0' para dl e verifica se a posição da matriz do usuário sofreu disparo  
+   cmp matrizshow[bx][si], dl                          ;se for o 0, não é disparo
+   jne ja_disparou                                     ;se não for 0, já disparou   
 
-   cmp matriz[bx][si], 0
+   cmp matriz[bx][si], 0                               ;se esta parte da matriz das embarcações continua sendo 0, errou                                     
    je errou
    
 
-   mov matriz[bx][si], 0
-   mov matrizshow[bx][si],0Fah
-   call lim_km_prinn
-   lea dx, ma
+   mov matriz[bx][si], 0                               ;se acertou, move zero parao local da embarcação que sofreu disparo
+   mov matrizshow[bx][si],0Fah                         ;move asterisco para a matriz do usuário
+   call lim_km_prinn                                   ;imprime a matriz
+   lea dx, ma                                          ;informa acerto e pede outra tecla para disparar novamente
    PrintaMsg 9
    
    jmp acertou
    errou:
-   mov matrizshow[bx][si],1fh
-   call lim_km_prinn
-   lea dx, me
-   PrintaMsg 9
-   acertou:
+   mov matrizshow[bx][si],1fh                          ;se errou, move as aspas para a matriz de volta  
+   call lim_km_prinn                                   ;imprime a matriz do usuário     
+   lea dx, me                                          ;imprime a mensagem de erro  
+   PrintaMsg 9                         
+   acertou:                                            ;se acertou  
 
-   jmp nao_dsp_ja
+   jmp nao_dsp_ja                                      ;pula para label nao_dsp_ja  
 
    ja_disparou:
-   call lim_km_prinn
-   lea dx, mj
-   PrintaMsg 9
+   call lim_km_prinn                                   ;se não for 0, printa a matriz de novo
+   lea dx, mj                                          ;mostra mensagem informando que já disparou nesse local           
+   PrintaMsg 9                                           
    
    nao_dsp_ja:
 
-   PrintaMsg 1
+   PrintaMsg 1                                         ;lê caractere                                         
 
-   cmp al, 100
+   cmp al, 100                                         ;verifica se é o caractere de desistência    
    jne naosub
-   sub al, 32; Encerrar antes E aceitar tanto D como d
-   naosub:
+   sub al, 32                                          ;encerrar antes e aceitar tanto D como d
+   naosub:                                            
    cmp al, 68
-   jne n_encerrar
+   jne n_encerrar                                      ;passou pelas duas comparações, não encerra
    
   
    
-   mov al, 1
+   mov al, 1                                           ;setando a variável de controle de encerramento como 1  
    
-   mov controleEncerrar, al; encerrar
+   mov controleEncerrar, al                              ;encerrar
    
    n_encerrar:
 
@@ -794,22 +794,22 @@ endp
 
  ganhar_jogo proc
  mov ah, 0
- mov quantacertosTotal, ah
- xor bx, bx
+ mov quantacertosTotal, ah                               ;a quantidade de acertos total é 0 em um primeiro momento  
+ xor bx, bx                                                 
  mov di, 20
- loopconferirganho:
- mov cx, 20
+ loopconferirganho:                                      ;loop percorrendo a matriz
+ mov cx, 20                                              ;loop para as colunas         
  xor si, si
  trocalinhaconferirganho:
- mov ah, matrizshow[bx][si]
+ mov ah, matrizshow[bx][si]                              ;coloca elemento da matriz em ah para comparar com o asterisco                                 
  inc si
  cmp ah, 0Fah
  jne naoparaumponto
- push ax
- mov ax, 1
- add quantacertosTotal,al
+ push ax                                                 ;se for o asterisco: guarda contéudo de ax na pilha 
+ mov ax, 1                                               
+ add quantacertosTotal,al                                ;incrementa a variável de quantidade de acertos   
  pop ax
- naoparaumponto:
+ naoparaumponto:                                         ;se não for asterisco, continua fazendo loop
  loop trocalinhaconferirganho
  add bx, 20
  dec di
@@ -824,41 +824,41 @@ endp
 
 
  naufragios proc
-                                                                                       ;Recebe a info de qual é o numero da embarcação com Al antes do call
- mov ah, 6
+                                                            ;Recebe a info de qual é o numero da embarcação com Al antes do call
+ mov ah, 6                                                  ;a quantidade de naufrágios é 6 no máximo
  mov quantidadenaufragios, ah
 
- ;mov ah, 6  Haviao
+                                                            ;mov ah, 6  Haviao
  call confnauplural
 
- mov ah, 5;Haviao
+ mov ah, 5                                                  ;Hidroavião
  call confnauplural
 
- mov ah, 4;sub
+ mov ah, 4                                                  ;Submarino
  call confnauplural
   
- mov ah, 3;sub
+ mov ah, 3                                                  ;Submarino 
  call confnauplural
 
- mov ah, 2;frag
+ mov ah, 2                                                  ;Fragrata
  call confnauplural
 
- mov ah, 1;enc
+ mov ah, 1                                                  ;Encouraçado
  call confnauplural
 
  ret 
  naufragios endp
 
  confnauplural proc
- xor bx, bx
- mov di, 20
- laco1:
+ xor bx, bx                                                 ;laço para leitura da matriz
+ mov di, 20                                                 ;contador para as linhas      
+ laco1:                 
  xor si, si
- mov cx, 20
+ mov cx, 20                                                 ;contador para colunos
  laco2:
- cmp matriz[bx][si], ah
+ cmp matriz[bx][si], ah                                     ;verifica se o elemento é igual ao número da embarcação  
  jne negativo
- mov al, 1                                                  ;se for 
+ mov al, 1                                                  ;se for, subtrai 1 da quantidade de naufrágios (que era 6)
  sub quantidadenaufragios, al
  jmp finalneg
  negativo:
