@@ -111,25 +111,25 @@ endm
     jmp final_da_definicao                                    ;pula para final da definição após sair do procedimento
 
     config3:                                                  ;a depender de cada config sorteada, entra em seu respectivo procedimento
-    call mod3
+    call mod3                                                 ;chama procedimento da config3
     jmp final_da_definicao
 
-    config2:
+    config2:                                                  ;chama procedimento da config2
     call mod2
     jmp final_da_definicao
 
     config1:
-    call mod1
+    call mod1                                                  ;chama procedimento da config1
 
     final_da_definicao:                                                                                               
 
-    call lim_km_prinn                                         ;chama o procedimento lim_km_prinn
+    call lim_km_prinn                                         ;chama o procedimento que imprime a matriz que será mostrada ao usuário
 
-    lea dx, minicial
+    lea dx, minicial                                          ;imprime a mensagem inicial
     PrintaMsg 9
-    PrintaMsg 1
-    call lim_km_prinn
-    call in_game
+    PrintaMsg 8                                               ;"Digite qualquer tecla para continuar"       
+    call lim_km_prinn                                         ;Após o usuário digitar qualquer tecla, chama o procedimento que imprime a matriz novamente
+    call in_game                                              ;após imprimir a matriz 
 
 
     mov ah,4ch                                                 ;encerrando
@@ -142,274 +142,274 @@ endm
 
 
 
-;                                   MODELO1
+;                                   MODELO3
 
 
- mod3 PROC
+mod3 PROC
    ZerarValor                                                  ;zera índices SI e DI
    SortearMacro                                                ;sorteia valor
-   mov cx,4
-   mov al, 20
-   mul bl                                                                        
-   xchg bx, ax
+   mov cx,4                                                    ;define contagem para encouraçado
+   mov al, 20                                                  ;carrega valor 20 em al
+   mul bl                                                      ;multiplica al por bl
+   xchg bx, ax                                                 ;troca valores de bx e ax
    encouracado1:                                               ;dispõe o encouraçado na posição sorteada
-   mov matriz [bx][si], 1
-   inc si
-   loop encouracado1
+   mov matriz [bx][si], 1                                      ;insere o valor 1 na matriz
+   inc si                                                      ;incrementa si
+   loop encouracado1                                           ;loop para a próxima posição
 
    mov bx, 14                                                  ;muda a posição dos índices
-   mov si, 17  
+   mov si, 17                                                  ;define índice si
    SortearMacro                                                ;sorteia valor
-   mov cx, 3
+   mov cx, 3                                                   ;define contagem para fragata
    mov al,20                                                   ;a depender do valor sorteado, irá para uma posição aleatória da matriz
-   mul bl
-   xchg bx, ax
-   fragata1:
-   mov matriz [bx][si], 2                                      ;dispõe a fragata (3 posições -> cx = 3) na posição sorteada
+   mul bl                                                      ;multiplica al por bl
+   xchg bx, ax                                                 ;troca valores de bx e ax
+   fragata1:                                                   ;dispõe a fragata na posição sorteada
+   mov matriz [bx][si], 2                                      ;insere o valor 2 na matriz
    add bx, 20                                                  ;vai para próxima linha (continuação da disposição da fragata na matriz)
-   loop fragata1 
+   loop fragata1                                               ;loop para a próxima posição
 
-   mov bx, 10                                                  ;muda a posição dos índices                                                                                     
-   mov si, 5
-   SortearMacro                                                ;sorteia valor      
-   mov cx,2                                                    ;a depender do valor sorteado, irá para uma posição aleatória da matriz
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   submarino1:
-   mov matriz [bx][si], 3                                      ;dispõe o submarino1 (2 posições -> cx = 2) na posição sorteada
-   inc si
-   loop submarino1
+   mov bx, 10                                                  ;muda a posição dos índices
+   mov si, 5                                                   ;define índice si
+   SortearMacro                                                ;sorteia valor
+   mov cx,2                                                    ;define contagem para submarino1
+   mov al, 20                                                  ;a depender do valor sorteado, irá para uma posição aleatória da matriz
+   mul bl                                                      ;multiplica al por bl
+   xchg bx, ax                                                 ;troca valores de bx e ax
+   submarino1:                                                 ;dispõe o submarino1 na posição sorteada
+   mov matriz [bx][si], 3                                      ;insere o valor 3 na matriz
+   inc si                                                      ;incrementa si
+   loop submarino1                                             ;loop para a próxima posição
 
    xor bx,bx                                                   ;muda a posição dos índices
-   mov si, 17
+   mov si, 17                                                  ;define índice si
    SortearMacro                                                ;sorteia valor
-   mov cx, 2                                                                                                                        
+   mov cx, 2                                                   ;define contagem para submarino2
    mov al,20                                                   ;a depender do valor sorteado, irá para uma posição aleatória da matriz
-   mul bl                                                                                                                  
-   xchg bx, ax
-   submarino2:                                                 ;dispõe o submarino2 (2 posições -> cx = 2) na posição sorteada   
-   mov matriz [bx][si], 4                                                                                                  
-   add bx, 20
-   loop submarino2
+   mul bl                                                      ;multiplica al por bl
+   xchg bx, ax                                                 ;troca valores de bx e ax
+   submarino2:                                                 ;dispõe o submarino2 na posição sorteada   
+   mov matriz [bx][si], 4                                      ;insere o valor 4 na matriz
+   add bx, 20                                                  ;vai para próxima linha
+   loop submarino2                                             ;loop para a próxima posição
   
-   mov bx, 3                                                    ;muda a posição dos índices
-   mov si, 7               
-   SortearMacro                                                 ;sorteia valor  
-   mov cx, 3                                                                                                             
-   mov al,20                                                    ;a depender do valor sorteado, vai para uma posição aleatória da matriz
-   mul bl
-   xchg bx, ax
-   PushVMatriz                                                  ;pilha -> si|bx                                                                                           
-   add bx, 20                                                   ;bx na próxima linha
-   add si, 1                                                    ;si na próxima coluna
-   mov matriz [bx][si],5                                        ;insere a "cabeça" do hidroavião
-   PopVMatriz                                                   ;retorna valor dos registradores
-   hidro_aviao1:
-   mov matriz [bx][si],5                                        ;insere o resto do corpo do hidroavião
-   add bx, 20
-   loop hidro_aviao1
+   mov bx, 3                                                   ;muda a posição dos índices
+   mov si, 7                                                   ;define índice si
+   SortearMacro                                                ;sorteia valor  
+   mov cx, 3                                                   ;define contagem para hidroavião1
+   mov al,20                                                   ;a depender do valor sorteado, vai para uma posição aleatória da matriz
+   mul bl                                                      ;multiplica al por bl
+   xchg bx, ax                                                 ;troca valores de bx e ax
+   PushVMatriz                                                 ;pilha -> si|bx                                                                                           
+   add bx, 20                                                  ;bx na próxima linha
+   add si, 1                                                   ;si na próxima coluna
+   mov matriz [bx][si],5                                       ;insere a "cabeça" do hidroavião
+   PopVMatriz                                                  ;retorna valor dos registradores
+   hidro_aviao1:                                               ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],5                                       ;insere o valor 5 na matriz
+   add bx, 20                                                  ;vai para próxima linha
+   loop hidro_aviao1                                           ;loop para a próxima posição
 
-   mov bx, 15                                                   ;muda a posição dos índices
-   xor si,si
-   SortearMacro                                                 ;sorteia valor 
-   mov cx, 3                                                    ;a depender do valor sorteado, vai para uma posição aleatória da matriz                                      
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz                                                  ;pilha -> si|bx   
-   add bx, 20                                                   ;bx na próxima linha  
-   add si, 1                                                    ;si na próxima coluna
-   mov matriz [bx][si],6                                        ;insere a "cabeça" do hidroavião     
-   PopVMatriz                                                   ;retorna valor dos registradores  
-   hidro_aviao2:
-   mov matriz [bx][si],6                                        ;insere o resto do corpo do hidroavião
-   add bx, 20
-   loop hidro_aviao2
-   
+   mov bx, 15                                                  ;muda a posição dos índices
+   xor si,si                                                   ;zera índice si
+   SortearMacro                                                ;sorteia valor 
+   mov cx, 3                                                   ;define contagem para hidroavião2                                      
+   mov al,20                                                   ;a depender do valor sorteado, vai para uma posição aleatória da matriz
+   mul bl                                                      ;multiplica al por bl
+   xchg bx, ax                                                 ;troca valores de bx e ax
+   PushVMatriz                                                 ;pilha -> si|bx   
+   add bx, 20                                                  ;bx na próxima linha  
+   add si, 1                                                   ;si na próxima coluna
+   mov matriz [bx][si],6                                       ;insere a "cabeça" do hidroavião     
+   PopVMatriz                                                  ;retorna valor dos registradores  
+   hidro_aviao2:                                               ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],6                                       ;insere o valor 6 na matriz
+   add bx, 20                                                  ;vai para próxima linha
+   loop hidro_aviao2                                           ;loop para a próxima posição
 
   ret
 
- mod3 ENDP
+mod3 ENDP
+
 
 
 ;                                          MODELO 2
  mod2 PROC
-   xor bx,bx
-   mov si, 13
-   SortearMacro
-   mov cx,4
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   encouracado1_2:
-   mov matriz [bx][si], 1
-   inc si
-   loop encouracado1_2
+   xor bx,bx                                                 ;zera índice bx
+   mov si, 13                                                ;define índice si
+   SortearMacro                                              ;sorteia valor
+   mov cx,4                                                  ;define contagem para encouraçado
+   mov al, 20                                                ;carrega valor 20 em al
+   mul bl                                                    ;multiplica al por bl
+   xchg bx, ax                                               ;troca valores de bx e ax
+   encouracado1_2:                                           ;dispõe o encouraçado na posição sorteada
+   mov matriz [bx][si], 1                                    ;insere o valor 1 na matriz
+   inc si                                                    ;incrementa si
+   loop encouracado1_2                                       ;loop para a próxima posição
 
-   mov bx, 1
-   mov si, 1
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   fragata1_2:
-   mov matriz [bx][si], 2
-   add bx, 20
-   loop fragata1_2 
+   mov bx, 1                                                 ;muda a posição dos índices
+   mov si, 1                                                 ;define índice si
+   SortearMacro                                              ;sorteia valor
+   mov cx, 3                                                 ;define contagem para fragata
+   mov al,20                                                 ;carrega valor 20 em al
+   mul bl                                                    ;multiplica al por bl
+   xchg bx, ax                                               ;troca valores de bx e ax
+   fragata1_2:                                               ;dispõe a fragata na posição sorteada
+   mov matriz [bx][si], 2                                    ;insere o valor 2 na matriz
+   add bx, 20                                                ;vai para próxima linha
+   loop fragata1_2                                           ;loop para a próxima posição
 
-   mov bx, 5
-   mov si, 10
-   SortearMacro
-   mov cx,2
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   submarino1_2:
-   mov matriz [bx][si], 3
-   inc si
-   loop submarino1_2
+   mov bx, 5                                                 ;muda a posição dos índices
+   mov si, 10                                                ;define índice si
+   SortearMacro                                              ;sorteia valor
+   mov cx,2                                                  ;define contagem para submarino1
+   mov al, 20                                                ;carrega valor 20 em al
+   mul bl                                                    ;multiplica al por bl
+   xchg bx, ax                                               ;troca valores de bx e ax
+   submarino1_2:                                             ;dispõe o submarino1 na posição sorteada
+   mov matriz [bx][si], 3                                    ;insere o valor 3 na matriz
+   inc si                                                    ;incrementa si
+   loop submarino1_2                                         ;loop para a próxima posição
 
-   mov bx, 5
-   mov si, 17
-   SortearMacro
-   mov cx, 2
-   mov al,20
-   mul bl
-   xchg bx, ax
-   submarino2_2:
-   mov matriz [bx][si], 4
-   add bx, 20
-   loop submarino2_2
+   mov bx, 5                                                 ;muda a posição dos índices
+   mov si, 17                                                ;define índice si
+   SortearMacro                                              ;sorteia valor
+   mov cx, 2                                                 ;define contagem para submarino2
+   mov al,20                                                 ;carrega valor 20 em al
+   mul bl                                                    ;multiplica al por bl
+   xchg bx, ax                                               ;troca valores de bx e ax
+   submarino2_2:                                             ;dispõe o submarino2 na posição sorteada
+   mov matriz [bx][si], 4                                    ;insere o valor 4 na matriz
+   add bx, 20                                                ;vai para próxima linha
+   loop submarino2_2                                         ;loop para a próxima posição
   
-   mov bx, 10
-   mov si, 8
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   add si, 1
-   mov matriz [bx][si],5
-   PopVMatriz
-   hidro_aviao1_2:
-   mov matriz [bx][si],5
-   add bx, 20
-   loop hidro_aviao1_2
-
-   mov bx, 15
-   mov si, 15
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz                                    
-   add bx, 20
-   add si, 1
-   mov matriz [bx][si],6
-   PopVMatriz
-   hidro_aviao2_2:
-   mov matriz [bx][si],6
-   add bx, 20
-   loop hidro_aviao2_2
-   
+   mov bx, 10                                                ;muda a posição dos índices
+   mov si, 8                                                 ;define índice si
+   SortearMacro                                              ;sorteia valor
+   mov cx, 3                                                 ;define contagem para hidroavião1
+   mov al,20                                                 ;carrega valor 20 em al
+   mul bl                                                    ;multiplica al por bl
+   xchg bx, ax                                               ;troca valores de bx e ax
+   PushVMatriz                                               ;pilha -> si|bx
+   add bx, 20                                                ;bx na próxima linha
+   add si, 1                                                 ;si na próxima coluna
+   mov matriz [bx][si],5                                     ;insere a "cabeça" do hidroavião
+   PopVMatriz                                                ;retorna valor dos registradores
+   hidro_aviao1_2:                                           ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],5                                     ;insere o valor 5 na matriz
+   add bx, 20                                                ;vai para próxima linha
+   loop hidro_aviao1_2                                       ;loop para a próxima posição
+ 
+   mov bx, 15                                                ;muda a posição dos índices
+   mov si, 15                                                ;define índice si
+   SortearMacro                                              ;sorteia valor
+   mov cx, 3                                                 ;define contagem para hidroavião2
+   mov al,20                                                 ;carrega valor 20 em al
+   mul bl                                                    ;multiplica al por bl
+   xchg bx, ax                                               ;troca valores de bx e ax
+   PushVMatriz                                               ;pilha -> si|bx
+   add bx, 20                                                ;bx na próxima linha  
+   add si, 1                                                 ;si na próxima coluna
+   mov matriz [bx][si],6                                     ;insere a "cabeça" do hidroavião     
+   PopVMatriz                                                ;retorna valor dos registradores  
+   hidro_aviao2_2:                                           ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],6                                     ;insere o valor 6 na matriz
+   add bx, 20                                                ;vai para próxima linha
+   loop hidro_aviao2_2                                       ;loop para a próxima posição
 
   ret
 
- mod2 ENDP
+mod2 ENDP
+
 
 
 
 ;                                                  MODELO 1
- mod1 PROC
-   mov bx, 13
-   xor si,si
-   SortearMacro
-   mov cx, 4
-   mov al,20
-   mul bl
-   xchg bx, ax
-   encouracado1_1:
-   mov matriz [bx][si], 1
-   add bx, 20
-   loop encouracado1_1 
+mod1 PROC
+   mov bx, 13                                                 ;define índice bx
+   xor si,si                                                  ;zera índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 4                                                  ;define contagem para encouraçado
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   encouracado1_1:                                            ;dispõe o encouraçado na posição sorteada
+   mov matriz [bx][si], 1                                     ;insere o valor 1 na matriz
+   add bx, 20                                                 ;vai para próxima linha
+   loop encouracado1_1                                        ;loop para a próxima posição 
 
-   mov bx, 16
-   mov si, 12
-   SortearMacro
-   mov cx,3
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   fragata1_1:
-   mov matriz [bx][si], 2
-   inc si
-   loop fragata1_1
+   mov bx, 16                                                 ;muda a posição dos índices
+   mov si, 12                                                 ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx,3                                                   ;define contagem para fragata
+   mov al, 20                                                 ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   fragata1_1:                                                ;dispõe a fragata na posição sorteada
+   mov matriz [bx][si], 2                                     ;insere o valor 2 na matriz
+   inc si                                                     ;incrementa si
+   loop fragata1_1                                            ;loop para a próxima posição
 
-   mov bx, 8
-   mov si, 10
-   SortearMacro
-   mov cx,2
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   submarino1_1:
-   mov matriz [bx][si], 3
-   inc si
-   loop submarino1_1
+   mov bx, 8                                                  ;muda a posição dos índices
+   mov si, 10                                                 ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx,2                                                   ;define contagem para submarino1
+   mov al, 20                                                 ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   submarino1_1:                                              ;dispõe o submarino1 na posição sorteada
+   mov matriz [bx][si], 3                                     ;insere o valor 3 na matriz
+   inc si                                                     ;incrementa si
+   loop submarino1_1                                          ;loop para a próxima posição
 
-   mov bx, 11
-   mov si, 5
-   SortearMacro
-   mov cx, 2
-   mov al,20
-   mul bl
-   xchg bx, ax
-   submarino2_1:
-   mov matriz [bx][si], 4
-   add bx, 20
-   loop submarino2_1
+   mov bx, 11                                                 ;muda a posição dos índices
+   mov si, 5                                                  ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 2                                                  ;define contagem para submarino2
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   submarino2_1:                                              ;dispõe o submarino2 na posição sorteada
+   mov matriz [bx][si], 4                                     ;insere o valor 4 na matriz
+   add bx, 20                                                 ;vai para próxima linha
+   loop submarino2_1                                          ;loop para a próxima posição
 
-   xor bx,bx
-   mov si, 2
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   dec si
-   mov matriz [bx][si],5
-   PopVMatriz
-   hidro_aviao1_1:
-   mov matriz [bx][si],5
-   add bx, 20
-   loop hidro_aviao1_1
+   xor bx,bx                                                  ;zera índice bx
+   mov si, 2                                                  ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 3                                                  ;define contagem para hidroavião1
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   PushVMatriz; pilha -> si|bx                                ;pilha -> si|bx
+   add bx, 20                                                 ;bx na próxima linha
+   dec si                                                     ;decrementa si
+   mov matriz [bx][si],5                                      ;insere a "cabeça" do hidroavião
+   PopVMatriz                                                 ;retorna valor dos registradores
+   hidro_aviao1_1:                                            ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],5                                      ;insere o valor 5 na matriz
+   add bx, 20                                                 ;vai para próxima linha
+   loop hidro_aviao1_1                                        ;loop para a próxima posição
 
-   xor bx,bx
-   mov si, 10
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   inc si
-   mov matriz [bx][si],6
-   PopVMatriz
-   hidro_aviao2_1:
-   mov matriz [bx][si],6
-   add bx, 20
-   loop hidro_aviao2_1
+   xor bx,bx                                                  ;zera índice bx
+   mov si, 10                                                 ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 3                                                  ;define contagem para hidroavião2
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   PushVMatriz; pilha -> si|bx                                ;pilha -> si|bx
+   add bx, 20                                                 ;bx na próxima linha  
+   inc si                                                     ;incrementa si
+   mov matriz [bx][si],6                                      ;insere a "cabeça" do hidroavião     
+   PopVMatriz                                                 ;retorna valor dos registradores  
+   hidro_aviao2_1:                                            ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],6                                      ;insere o valor 6 na matriz
+   add bx, 20                                                 ;vai para próxima linha
+   loop hidro_aviao2_1                                        ;loop para a próxima posição
 
    ret
- mod1 ENDP
+mod1 ENDP
 
 
 
@@ -421,90 +421,91 @@ endm
  ;                                            MODELO 0
  mod0 PROC
    
-   mov bx, 13
-   mov si, 1
-   SortearMacro
-   mov cx, 4
-   mov al,20
-   mul bl
-   xchg bx, ax
-   encouracado1_0:
-   mov matriz [bx][si], 1
-   add bx, 20
-   loop encouracado1_0
+   mov bx, 13                                                 ;define índice bx
+   mov si, 1                                                  ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 4                                                  ;define contagem para encouraçado
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   encouracado1_0:                                            ;dispõe o encouraçado na posição sorteada
+   mov matriz [bx][si], 1                                     ;insere o valor 1 na matriz
+   add bx, 20                                                 ;vai para próxima linha
+   loop encouracado1_0                                        ;loop para a próxima posição
 
-   mov bx, 16
-   mov si, 12
-   SortearMacro
-   mov cx,3
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   fragata1_0:
-   mov matriz [bx][si], 2
-   inc si
-   loop fragata1_0
+   mov bx, 16                                                 ;muda a posição dos índices
+   mov si, 12                                                 ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx,3                                                   ;define contagem para fragata
+   mov al, 20                                                 ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   fragata1_0:                                                ;dispõe a fragata na posição sorteada
+   mov matriz [bx][si], 2                                     ;insere o valor 2 na matriz
+   inc si                                                     ;incrementa si
+   loop fragata1_0                                            ;loop para a próxima posição
 
-   mov bx, 8
-   mov si, 10
-   SortearMacro
-   mov cx,2
-   mov al, 20
-   mul bl
-   xchg bx, ax
-   submarino1_0:
-   mov matriz [bx][si], 3
-   inc si
-   loop submarino1_0
+   mov bx, 8                                                  ;muda a posição dos índices
+   mov si, 10                                                 ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx,2                                                   ;define contagem para submarino1
+   mov al, 20                                                 ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   submarino1_0:                                              ;dispõe o submarino1 na posição sorteada
+   mov matriz [bx][si], 3                                     ;insere o valor 3 na matriz
+   inc si                                                     ;incrementa si
+   loop submarino1_0                                          ;loop para a próxima posição
 
-   mov bx, 11
-   mov si, 5
-   SortearMacro
-   mov cx, 2
-   mov al,20
-   mul bl
-   xchg bx, ax
-   submarino2_0:
-   mov matriz [bx][si], 4
-   add bx, 20
-   loop submarino2_0
+   mov bx, 11                                                 ;muda a posição dos índices
+   mov si, 5                                                  ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 2                                                  ;define contagem para submarino2
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   submarino2_0:                                              ;dispõe o submarino2 na posição sorteada
+   mov matriz [bx][si], 4                                     ;insere o valor 4 na matriz
+   add bx, 20                                                 ;vai para próxima linha
+   loop submarino2_0                                          ;loop para a próxima posição
 
-   xor bx,bx
-   mov si, 10
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   inc si
-   mov matriz [bx][si],5
-   PopVMatriz
-   hidro_aviao1_0:
-   mov matriz [bx][si],5
-   inc si
-   loop hidro_aviao1_0
+   xor bx,bx                                                  ;zera índice bx
+   mov si, 10                                                 ;define índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 3                                                  ;define contagem para hidroavião1
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   PushVMatriz; pilha -> si|bx                                ;pilha -> si|bx
+   add bx, 20                                                 ;bx na próxima linha
+   inc si                                                     ;incrementa si
+   mov matriz [bx][si],5                                      ;insere a "cabeça" do hidroavião
+   PopVMatriz                                                 ;retorna valor dos registradores
+   hidro_aviao1_0:                                            ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],5                                      ;insere o valor 5 na matriz
+   inc si                                                     ;incrementa si
+   loop hidro_aviao1_0                                        ;loop para a próxima posição
 
-   xor bx,bx
-   xor si,si
-   SortearMacro
-   mov cx, 3
-   mov al,20
-   mul bl
-   xchg bx, ax
-   PushVMatriz; pilha -> si|bx
-   add bx, 20
-   inc si
-   mov matriz [bx][si],6
-   PopVMatriz
-   hidro_aviao2_0:
-   mov matriz [bx][si],6
-   inc si
-   loop hidro_aviao2_0
+   xor bx,bx                                                  ;zera índice bx
+   xor si,si                                                  ;zera índice si
+   SortearMacro                                               ;sorteia valor
+   mov cx, 3                                                  ;define contagem para hidroavião2
+   mov al,20                                                  ;carrega valor 20 em al
+   mul bl                                                     ;multiplica al por bl
+   xchg bx, ax                                                ;troca valores de bx e ax
+   PushVMatriz; pilha -> si|bx                                ;pilha -> si|bx
+   add bx, 20                                                 ;bx na próxima linha  
+   inc si                                                     ;incrementa si
+   mov matriz [bx][si],6                                      ;insere a "cabeça" do hidroavião     
+   PopVMatriz                                                 ;retorna valor dos registradores  
+   hidro_aviao2_0:                                            ;insere o resto do corpo do hidroavião
+   mov matriz [bx][si],6                                      ;insere o valor 6 na matriz
+   inc si                                                     ;incrementa si
+   loop hidro_aviao2_0                                        ;loop para a próxima posição
 
  ret
- mod0 ENDP
+mod0 ENDP
+
 
  ;Sortear3
 
