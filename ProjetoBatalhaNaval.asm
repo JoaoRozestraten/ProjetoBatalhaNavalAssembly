@@ -638,14 +638,14 @@ endp
 
     mov ah,2
     mov dl, quantacertosTotal                         ;imprime a quantidade de acertos até agora
-    or dl, 30h
+    add dl, 30h
     cmp dl, 39h                                       ;verifica se o número é maior que 9
     jb naosubitrair
     push dx                                           ;guarda o número na pilha
     mov dl, 31h                                       ;imprime o 1 na frente
     int 21h
     pop dx                                            ;volta o número em dx
-    sub dl, 10h                                       ;remove a dezena
+    sub dl, 10                                        ;remove a dezena
     naosubitrair:                                     ;não é maior, imprime normalmente
     int 21h
 
